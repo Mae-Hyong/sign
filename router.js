@@ -1,11 +1,12 @@
 const express = require('express');
 const mysql = require('mysql');
 const bcrypt = require('bcrypt');
+const cors = require('cors');
 const db = require('./DB'); // DB.js 파일을 불러옵니다.
 
 const app = express();
 
-const port = 3000;
+const port = 8001;
 
 // express.json() 미들웨어를 사용하여 POST 요청의 body를 파싱합니다.
 app.use(express.json());
