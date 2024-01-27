@@ -5,7 +5,7 @@ const db = require('./DB'); // DB.js 파일을 불러옵니다.
 
 const app = express();
 
-const port = 8001;
+const PORT = 8001;
 
 // express.json() 미들웨어를 사용하여 POST 요청의 body를 파싱합니다.
 app.use(express.json());
@@ -124,6 +124,6 @@ app.get('/apply_check', async (req, res) => {
 });
 
   // 서버를 지정된 포트에서 실행합니다.
-app.listen(port, () => {
-  console.log(`SERVER 실행됨 ${port}`);
+app.listen(PORT, () => {
+  console.log(`SERVER 실행됨 ${PORT}`);
 });
