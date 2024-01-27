@@ -25,7 +25,7 @@ app.post('/register', async (req, res) => {
   const hashedPassword = await bcrypt.hash(userPassword, 10);
 
   // MySQL 쿼리를 생성하여 사용자 정보를 데이터베이스에 저장합니다.
-  const query = 'INSERT INTO sign_up (user_id, user_password, phone_number) VALUES (?, ?, ?)';
+  const query = 'INSERT INTO user_clients (user_id, user_password, phone_number) VALUES (?, ?, ?)';
   db.query(query, [userId, hashedPassword, phoneNumber], (err, result) => {
     // 에러가 발생하면 에러를 콘솔에 출력하고 500 상태 코드로 응답합니다.
     if (err) {
@@ -46,7 +46,7 @@ app.post('/login', async (req, res) => {
   const { userId, userPassword } = req.body;
 
   // MySQL 쿼리를 생성하여 사용자 아이디로 사용자 정보를 조회합니다.
-  const query = 'SELECT * FROM sign_up WHERE user_id = ?';
+  const query = 'SELECT * FROM user_clients WHERE user_id = ?';
   db.query(query, [userId], async (err, result) => {
     // 에러가 발생하면 에러를 콘솔에 출력하고 500 상태 코드로 응답합니다.
     if (err) {
@@ -76,7 +76,6 @@ app.post('/login', async (req, res) => {
 
 // '/users' 경로에 대한 GET 요청 핸들러 함수를 정의합니다.
 app.get('/users', (req, res) => {
-  // DB 연결 객체를 통해 'sign_up' 테이블에서 모든 데이터를 가져옵니다.
   db.query('SELECT * from user_profile', (err, results) => {
     // 오류가 발생하면 오류를 콘솔에 출력하고 처리를 중단합니다.
     if (err) throw err;
