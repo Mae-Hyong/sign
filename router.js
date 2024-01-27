@@ -5,7 +5,7 @@ const db = require('./DB'); // DB.js 파일을 불러옵니다.
 
 const app = express();
 
-const PORT = 8001;
+const PORT = process.env.PORT || 8080;
 
 // express.json() 미들웨어를 사용하여 POST 요청의 body를 파싱합니다.
 app.use(express.json());
