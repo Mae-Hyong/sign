@@ -76,13 +76,35 @@ app.post('/login', async (req, res) => {
 
 // '/users' 경로에 대한 GET 요청 핸들러 함수를 정의합니다.
 app.get('/users', (req, res) => {
-  db.query('SELECT * from user_profile', (err, results) => {
-    // 오류가 발생하면 오류를 콘솔에 출력하고 처리를 중단합니다.
-    if (err) throw err;
+  const userName = req.query.user_name;
 
-    // 클라이언트에 결과를 응답으로 보냅니다.
-    res.send(results);
-  });
+  // 만약 user_name 매개변수가 제공된 경우, 필터링된 쿼리를 수행합니다.
+  if (userName) {
+    const query = 'SELECT * FROM user_profile WHERE user_name = ?';
+
+    db.query(query, [userName], (err, results) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send('내부 서버 오류');
+        return;
+      }
+
+      res.send(results);
+    });
+  } else {
+    // 만약 user_name 매개변수가 제공되지 않은 경우, 모든 사용자를 검색합니다.
+    const query = 'SELECT * FROM user_profile';
+
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send('내부 서버 오류');
+        return;
+      }
+
+      res.send(results);
+    });
+  }
 });
 
 app.post('/profile', async (req, res) => {
