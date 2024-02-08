@@ -25,7 +25,7 @@ app.post('/register', async (req, res) => {
   const hashedPassword = await bcrypt.hash(userPassword, 10);
 
   // MySQL 쿼리를 생성하여 사용자 정보를 데이터베이스에 저장합니다.
-  const query = 'INSERT INTO user_clients (user_id, user_password, phone_number) VALUES (?, ?, ?)';
+  const query = 'INSERT INTO user_info (user_id, user_password, phone_number) VALUES (?, ?, ?)';
   db.query(query, [userId, hashedPassword, phoneNumber], (err, result) => {
     // 에러가 발생하면 에러를 콘솔에 출력하고 500 상태 코드로 응답합니다.
     if (err) {
@@ -46,7 +46,7 @@ app.post('/login', async (req, res) => {
   const { userId, userPassword } = req.body;
 
   // MySQL 쿼리를 생성하여 사용자 아이디로 사용자 정보를 조회합니다.
-  const query = 'SELECT * FROM user_clients WHERE user_id = ?';
+  const query = 'SELECT * FROM user_info WHERE user_id = ?';
   db.query(query, [userId], async (err, result) => {
     // 에러가 발생하면 에러를 콘솔에 출력하고 500 상태 코드로 응답합니다.
     if (err) {
@@ -80,7 +80,7 @@ app.get('/users', (req, res) => {
 
   // 만약 user_name 매개변수가 제공된 경우, 필터링된 쿼리를 수행합니다.
   if (userName) {
-    const query = 'SELECT * FROM user_profile WHERE user_name = ?';
+    const query = 'SELECT * FROM user_info WHERE user_name = ?';
 
     db.query(query, [userName], (err, results) => {
       if (err) {
@@ -93,7 +93,7 @@ app.get('/users', (req, res) => {
     });
   } else {
     // 만약 user_name 매개변수가 제공되지 않은 경우, 모든 사용자를 검색합니다.
-    const query = 'SELECT * FROM user_profile';
+    const query = 'SELECT * FROM user_info';
 
     db.query(query, (err, results) => {
       if (err) {
@@ -107,20 +107,20 @@ app.get('/users', (req, res) => {
   }
 });
 
-app.post('/profile', async (req, res) => {
-  const { userName, masterAuth, userId } = req.body;
-  const query = 'INSERT INTO user_profile (user_name, master_auth, user_id) VALUES (?, ?, ?)'
-  db.query(query, [userName, masterAuth, userId], (err, result) => {
-    if(err) {
-      console.log(err);
-      res.status(500).send('Internal Server Error');
-      return;
-    }
+// app.post('/profile', async (req, res) => {
+//   const { userName, masterAuth, userId } = req.body;
+//   const query = 'INSERT INTO user_info (user_name, ) VALUES (?, ?, ?)'
+//   db.query(query, [userName, masterAuth, userId], (err, result) => {
+//     if(err) {
+//       console.log(err);
+//       res.status(500).send('Internal Server Error');
+//       return;
+//     }
 
-    console.log('Profile added:', result);
-    res.status(201).send('Profile added successfully');
-  });
-});
+//     console.log('Profile added:', result);
+//     res.status(201).send('Profile added successfully');
+//   });
+// });
   
 app.post('/apply', async (req, res) =>{
   const{ eMail, companyName, applyStatus, buisnessNumber, userName } = req.body;
