@@ -124,7 +124,7 @@ app.get('/users', (req, res) => {
   
 app.post('/apply', async (req, res) =>{
   const{ eMail, companyName, applyStatus, buisnessNumber, userName } = req.body;
-  const query = 'INSERT INTO master_apply (e_mail, company_name, apply_status, buisness_number, user_name) VALUES (?, ?, ?, ?, ?)'
+  const query = 'INSERT INTO master_apply (user_name, company_name, buisness_number, company_location, apply_status) VALUES (?, ?, ?, ?, ?)'
   db.query(query, [eMail, companyName, applyStatus, buisnessNumber, userName], (err, result) => {
     if(err) {
       console.log(err);
@@ -142,6 +142,20 @@ app.get('/apply_check', async (req, res) => {
     if (err) throw err;
 
     res.send(result);
+  });
+});
+
+const upload = require("./multer");
+
+app.post("/image", upload.single("file"), async (req, res, next) => {
+
+  var param = {
+    file: req.file,
+  };
+  
+  return res.json({
+    resultCode: 200,
+    resultMsg: "파일 업로드 성공",
   });
 });
 
