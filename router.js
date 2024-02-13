@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
+const upload = require("./multer");
 const db = require('./DB'); // DB.js 파일을 불러옵니다.
 
 const app = express();
@@ -145,17 +146,85 @@ app.get('/apply_check', async (req, res) => {
   });
 });
 
-const upload = require("./multer");
+// app.post("/image", upload.single("file"), async (req, res, next) => {
+
+//   var param = {
+//     file: req.file,
+//   };
+  
+//   return res.json({
+//     resultCode: 200,
+//     resultMsg: "파일 업로드 성공",
+//   });
+// });
 
 app.post("/image", upload.single("file"), async (req, res, next) => {
+  const { userId, userName } = req.body;
 
-  var param = {
-    file: req.file,
-  };
+  // 파일 업로드가 있을 경우에만 이미지 경로를 업데이트합니다.
+  let userImage = null;
+  if (req.file) {
+    userImage = req.file.path;
+  }
+
+  // 사용자 이름과 이미지 경로를 업데이트하는 쿼리를 생성합니다.
+  const updateQuery = "UPDATE user_info SET user_name = ?, user_image = ? WHERE user_id = ?";
   
-  return res.json({
-    resultCode: 200,
-    resultMsg: "파일 업로드 성공",
+  db.query(updateQuery, [userName, userImage, userId], (err, result) => {
+    if (err) {
+      console.error("Error updating user info in database:", err);
+      return res.status(500).json({
+        resultCode: 500,
+        resultMsg: "회원 정보를 업데이트하는 도중 오류가 발생했습니다.",
+      });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        resultCode: 404,
+        resultMsg: "해당하는 사용자를 찾을 수 없습니다.",
+      });
+    }
+
+    return res.json({
+      resultCode: 200,
+      resultMsg: "회원 정보 업데이트 성공",
+    });
+  });
+});
+
+app.get("/userImage", (req, res) => {
+  const userId = req.query.user_id;
+  if (!userId) {
+    return res.status(400).json({
+      resultCode: 400,
+      resultMsg: "사용자 ID를 제공해야 합니다.",
+    });
+  }
+
+  const selectQuery = "SELECT user_image FROM user_info WHERE user_id = ?";
+  
+  db.query(selectQuery, [userId], (err, result) => {
+    if (err) {
+      console.error("Error fetching user image from database:", err);
+      return res.status(500).json({
+        resultCode: 500,
+        resultMsg: "사용자 이미지를 조회하는 도중 오류가 발생했습니다.",
+      });
+    }
+
+    if (result.length === 0) {
+      return res.status(404).json({
+        resultCode: 404,
+        resultMsg: "해당하는 사용자의 이미지를 찾을 수 없습니다.",
+      });
+    }
+
+    const userImage = result[0].user_image;
+    return res.json({
+      resultCode: 200,
+      userImage: userImage,
+    });
   });
 });
 
