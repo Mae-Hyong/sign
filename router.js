@@ -1,6 +1,5 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const cors = require('cors');
 const upload = require("./multer");
 const db = require('./DB'); // DB.js 파일을 불러옵니다.
 
@@ -75,54 +74,6 @@ app.post('/login', async (req, res) => {
   });
 });
 
-// '/users' 경로에 대한 GET 요청 핸들러 함수를 정의합니다.
-app.get('/users', (req, res) => {
-  const userName = req.query.user_name;
-
-  // 만약 user_name 매개변수가 제공된 경우, 필터링된 쿼리를 수행합니다.
-  if (userName) {
-    const query = 'SELECT * FROM user_info WHERE user_name = ?';
-
-    db.query(query, [userName], (err, results) => {
-      if (err) {
-        console.error(err);
-        res.status(500).send('내부 서버 오류');
-        return;
-      }
-
-      res.send(results);
-    });
-  } else {
-    // 만약 user_name 매개변수가 제공되지 않은 경우, 모든 사용자를 검색합니다.
-    const query = 'SELECT * FROM user_info';
-
-    db.query(query, (err, results) => {
-      if (err) {
-        console.error(err);
-        res.status(500).send('내부 서버 오류');
-        return;
-      }
-
-      res.send(results);
-    });
-  }
-});
-
-// app.post('/profile', async (req, res) => {
-//   const { userName, masterAuth, userId } = req.body;
-//   const query = 'INSERT INTO user_info (user_name, ) VALUES (?, ?, ?)'
-//   db.query(query, [userName, masterAuth, userId], (err, result) => {
-//     if(err) {
-//       console.log(err);
-//       res.status(500).send('Internal Server Error');
-//       return;
-//     }
-
-//     console.log('Profile added:', result);
-//     res.status(201).send('Profile added successfully');
-//   });
-// });
-  
 app.post('/apply', async (req, res) =>{
   const{ eMail, companyName, applyStatus, buisnessNumber, userName } = req.body;
   const query = 'INSERT INTO master_apply (user_name, company_name, buisness_number, company_location, apply_status) VALUES (?, ?, ?, ?, ?)'
@@ -146,19 +97,7 @@ app.get('/apply_check', async (req, res) => {
   });
 });
 
-// app.post("/image", upload.single("file"), async (req, res, next) => {
-
-//   var param = {
-//     file: req.file,
-//   };
-  
-//   return res.json({
-//     resultCode: 200,
-//     resultMsg: "파일 업로드 성공",
-//   });
-// });
-
-app.post("/image", upload.single("file"), async (req, res, next) => {
+app.post("/profile_update", upload.single("file"), async (req, res, next) => {
   const { userId, userName } = req.body;
 
   // 파일 업로드가 있을 경우에만 이미지 경로를 업데이트합니다.
@@ -193,7 +132,7 @@ app.post("/image", upload.single("file"), async (req, res, next) => {
   });
 });
 
-app.get("/userImage", (req, res) => {
+app.get("/user_info", (req, res) => {
   const userId = req.query.user_id;
   if (!userId) {
     return res.status(400).json({
@@ -202,10 +141,10 @@ app.get("/userImage", (req, res) => {
     });
   }
 
-  const selectQuery = "SELECT user_image FROM user_info WHERE user_id = ?";
+  const selectQuery = "SELECT user_name, user_image FROM user_info WHERE user_id = ?";
   
   db.query(selectQuery, [userId], (err, result) => {
-    if (err) {
+    if (err) { 
       console.error("Error fetching user image from database:", err);
       return res.status(500).json({
         resultCode: 500,
@@ -228,7 +167,7 @@ app.get("/userImage", (req, res) => {
   });
 });
 
-  // 서버를 지정된 포트에서 실행합니다.
+// 서버를 지정된 포트에서 실행합니다.
 app.listen(PORT, () => {
   console.log(`SERVER 실행됨 ${PORT}`);
 });
