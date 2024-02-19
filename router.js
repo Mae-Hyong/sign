@@ -100,13 +100,22 @@ app.get('/apply_check', async (req, res) => {
 app.post("/profile_update", upload.single("file"), async (req, res, next) => {
   const { userId, userName } = req.body;
 
-  // 파일 업로드가 있을 경우에만 이미지 경로를 업데이트합니다.
+  // 파일 업로드가 있을 경우에만 이미지를 Cloudinary에 업로드하고 이미지 URL을 받아옵니다.
   let userImage = null;
   if (req.file) {
-    userImage = req.file.path;
+    try {
+      const result = await cloudinary.uploader.upload(req.file.path);
+      userImage = result.secure_url;
+    } catch (error) {
+      console.error("Error uploading image to Cloudinary:", error);
+      return res.status(500).json({
+        resultCode: 500,
+        resultMsg: "이미지를 Cloudinary에 업로드하는 도중 오류가 발생했습니다.",
+      });
+    }
   }
 
-  // 사용자 이름과 이미지 경로를 업데이트하는 쿼리를 생성합니다.
+  // 사용자 이름과 이미지 URL을 업데이트하는 쿼리를 생성합니다.
   const updateQuery = "UPDATE user_info SET user_name = ?, user_image = ? WHERE user_id = ?";
   
   db.query(updateQuery, [userName, userImage, userId], (err, result) => {
