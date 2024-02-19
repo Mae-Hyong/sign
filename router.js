@@ -1,6 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const cloudinary = require('cloudinary').v2;
+const cloudinary = require('./cloudinary'); // 수정된 부분
 const upload = require("./multer");
 const db = require('./DB'); // DB.js 파일을 불러옵니다.
 
