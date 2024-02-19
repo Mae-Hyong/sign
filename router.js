@@ -118,6 +118,7 @@ app.post("/profile_update", upload.single("file"), async (req, res, next) => {
         return res.status(500).json({
           resultCode: 500,
           resultMsg: "회원 정보를 업데이트하는 도중 오류가 발생했습니다.",
+          error: err.message // 추가: 데이터베이스 오류 메시지 포함
         });
       }
 
@@ -138,6 +139,7 @@ app.post("/profile_update", upload.single("file"), async (req, res, next) => {
     return res.status(500).json({
       resultCode: 500,
       resultMsg: "이미지를 Cloudinary에 업로드하는 도중 오류가 발생했습니다.",
+      error: error.message // 추가: 업로드 오류 메시지 포함
     });
   }
 });
