@@ -1,10 +1,10 @@
 // multer.js
 const multer = require("multer");
-const path = require("path");
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, "uploads"));
+    // 임시 디렉토리로 변경
+    cb(null, "./temp/");
   },
   filename: function (req, file, cb) {
     const currentDate = new Date();
