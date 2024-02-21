@@ -98,9 +98,6 @@ app.get('/apply_check', async (req, res) => {
   });
 });
 
-const { v2: cloudinary } = require('cloudinary');
-
-// router.js
 app.post("/profile_update", upload.single("file"), async (req, res, next) => {
   const { userId, userName } = req.body;
 
