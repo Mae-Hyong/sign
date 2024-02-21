@@ -1,9 +1,10 @@
-const storage = multer.diskStorage({
+const multer = require("multer");
+
+var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "./temp/"); // 임시 디렉토리로 변경
+    cb(null, "C:/Node/user_image");
   },
   filename: function (req, file, cb) {
-    // 파일 이름 생성 로직은 그대로 유지
     const currentDate = new Date();
     const year = currentDate.getFullYear();
     const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
@@ -11,8 +12,9 @@ const storage = multer.diskStorage({
     const hours = currentDate.getHours().toString().padStart(2, '0');
     const minutes = currentDate.getMinutes().toString().padStart(2, '0');
     const seconds = currentDate.getSeconds().toString().padStart(2, '0');
+
     const timestamp = `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
-    const originalnameWithoutSpaces = file.originalname.replace(/\s/g, '_');
+    const originalnameWithoutSpaces = file.originalname.replace(/\s/g, '_'); // 공백을 언더스코어(_)로 대체
     const newFilename = `${timestamp}_${originalnameWithoutSpaces}`;
     cb(null, newFilename);
   },
