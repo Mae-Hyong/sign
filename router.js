@@ -106,11 +106,13 @@ app.post("/profile_update", upload.single("file"), async (req, res, next) => {
     let userImage = null;
     if (req.file) {
       // 파일 업로드가 있을 경우 Cloudinary에 업로드하고 이미지 URL을 받아옵니다.
-      const result = await cloudinary.uploader.upload(req.file.path);
+      const result = await cloudinary.uploader.upload(req.file.buffer, {
+        folder: "user_images", // Cloudinary에 이미지를 저장할 폴더를 지정합니다.
+        use_filename: true, // 업로드된 파일의 이름을 사용합니다.
+        unique_filename: false, // 파일 이름의 중복을 허용합니다.
+        overwrite: true, // 파일이 이미 존재할 경우 덮어씁니다.
+      });
       userImage = result.secure_url;
-      
-      // Cloudinary에 업로드한 후에는 임시 파일을 삭제
-      fs.unlinkSync(req.file.path);
     }
 
     // 사용자 이름과 이미지 URL을 업데이트하는 쿼리를 생성합니다.
