@@ -1,7 +1,8 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const cloudinary = require('./cloudinary'); // 수정된 부분
+const cloudinary = require('./cloudinary');
 const upload = require("./multer");
+const fs = require('fs'); // fs 모듈을 추가
 const db = require('./DB'); // DB.js 파일을 불러옵니다.
 
 const app = express();
@@ -101,45 +102,52 @@ app.get('/apply_check', async (req, res) => {
 app.post("/profile_update", upload.single("file"), async (req, res, next) => {
   const { userId, userName } = req.body;
 
-  // 파일 업로드가 있을 경우에만 이미지를 Cloudinary에 업로드하고 이미지 URL을 받아옵니다.
-  let userImage = null;
-  if (req.file) {
-    try {
-      const result = await cloudinary.uploader.upload(req.file.path);
+  try {
+    let userImage = null;
+    if (req.file) {
+      // 파일 업로드가 있을 경우 Cloudinary에 업로드하고 이미지 URL을 받아옵니다.
+      const result = await cloudinary.uploader.upload(req.file.buffer, {
+        folder: "user_images", // Cloudinary에 이미지를 저장할 폴더를 지정합니다.
+        use_filename: true, // 업로드된 파일의 이름을 사용합니다.
+        unique_filename: false, // 파일 이름의 중복을 허용합니다.
+        overwrite: true, // 파일이 이미 존재할 경우 덮어씁니다.
+      });
       userImage = result.secure_url;
-    } catch (error) {
-      console.error("Error uploading image to Cloudinary:", error);
-      return res.status(500).json({
-        resultCode: 500,
-        resultMsg: "이미지를 Cloudinary에 업로드하는 도중 오류가 발생했습니다.",
-      });
-    }
-  }
-
-  // 사용자 이름과 이미지 URL을 업데이트하는 쿼리를 생성합니다.
-  const updateQuery = "UPDATE user_info SET user_name = ?, user_image = ? WHERE user_id = ?";
-  
-  db.query(updateQuery, [userName, userImage, userId], (err, result) => {
-    if (err) {
-      console.error("Error updating user info in database:", err);
-      return res.status(500).json({
-        resultCode: 500,
-        resultMsg: "회원 정보를 업데이트하는 도중 오류가 발생했습니다.",
-      });
     }
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({
-        resultCode: 404,
-        resultMsg: "해당하는 사용자를 찾을 수 없습니다.",
-      });
-    }
+    // 사용자 이름과 이미지 URL을 업데이트하는 쿼리를 생성합니다.
+    const updateQuery = "UPDATE user_info SET user_name = ?, user_image = ? WHERE user_id = ?";
+    
+    db.query(updateQuery, [userName, userImage, userId], (err, result) => {
+      if (err) {
+        console.error("Error updating user info in database:", err);
+        return res.status(500).json({
+          resultCode: 500,
+          resultMsg: "회원 정보를 업데이트하는 도중 오류가 발생했습니다.",
+          error: err.message
+        });
+      }
 
-    return res.json({
-      resultCode: 200,
-      resultMsg: "회원 정보 업데이트 성공",
+      if (result.affectedRows === 0) {
+        return res.status(404).json({
+          resultCode: 404,
+          resultMsg: "해당하는 사용자를 찾을 수 없습니다.",
+        });
+      }
+
+      return res.json({
+        resultCode: 200,
+        resultMsg: "회원 정보 업데이트 성공",
+      });
     });
-  });
+  } catch (error) {
+    console.error("Error uploading image to Cloudinary:", error);
+    return res.status(500).json({
+      resultCode: 500,
+      resultMsg: "이미지를 Cloudinary에 업로드하는 도중 오류가 발생했습니다.",
+      error: error.message
+    });
+  }
 });
 
 app.get("/user_info", (req, res) => {
