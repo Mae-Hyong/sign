@@ -1,6 +1,8 @@
 const multer = require("multer");
 
-// Multer 설정을 수정하여 로컬 디렉토리에 저장하지 않도록 변경합니다.
-const upload = multer();
+// multer의 storage 옵션을 사용하지 않고, memoryStorage를 사용하여 파일을 메모리에 저장합니다.
+const storage = multer.memoryStorage();
+
+const upload = multer({ storage: storage });
 
 module.exports = upload;
