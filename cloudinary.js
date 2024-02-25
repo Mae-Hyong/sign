@@ -1,21 +1,10 @@
 const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
- 
-cloudinary.config({
-    cloud_name:process.env.CLOUDINARY_CLOUD_NAME,
-    api_key:process.env.CLOUDINARY_KEY,
-    api_secret:process.env.CLOUDINARY_SECRET
-});
- 
-const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params:{
-        folder:'CafeBara',
-        allowedFormats: ['jpeg', 'png', 'jpg']
-    }
-});
- 
-module.exports = {
-    cloudinary,
-    storage
-}
+require('dotenv').config();
+
+cloudinary.config({ 
+    cloud_name: 'htqoudlxz', 
+    api_key: '916439993188377', 
+    api_secret: 'xFJiNTT5JjB8B7MWT_z3qLbmbNg' 
+  });
+
+module.exports = cloudinary;
