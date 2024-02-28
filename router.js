@@ -109,9 +109,7 @@ app.post("/profile_update", upload.single("file"), async (req, res, next) => {
       const fileBuffer = req.file.buffer;
 
       // 파일 Buffer를 Cloudinary에 업로드합니다.
-      const result = await cloudinary.uploader.upload(fileBuffer, {
-        folder: "user_images"
-      });
+      const result = await cloudinary.uploader.upload(fileBuffer);
       userImage = result.secure_url;
     }
 
