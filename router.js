@@ -105,9 +105,12 @@ app.post("/profile_update", upload.single("file"), async (req, res, next) => {
   try {
     let userImage = null;
     if (req.file) {
-      // 파일 업로드가 있을 경우 Cloudinary에 업로드하고 이미지 URL을 받아옵니다.
-      const result = await cloudinary.uploader.upload(req.file.buffer, {
-        folder: "user_images" // Cloudinary에 이미지를 저장할 폴더를 지정합니다.
+      // multer로 업로드한 파일의 Buffer를 사용합니다.
+      const fileBuffer = req.file.buffer;
+
+      // 클라우디너리에 이미지를 업로드합니다.
+      const result = await cloudinary.uploader.upload(fileBuffer, {
+        folder: "user_images"
       });
       userImage = result.secure_url;
     }
