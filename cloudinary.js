@@ -20,4 +20,6 @@ const uploadImage = async (imageBuffer) => {
 };
 
 
-module.exports = cloudinary;
+module.exports = {
+  uploadImage : uploadImage
+};
