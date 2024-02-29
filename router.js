@@ -1,6 +1,5 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const cloudinary = require('./cloudinary');
 const upload = require("./multer");
 const fs = require('fs'); // fs 모듈을 추가
 const db = require('./DB'); // DB.js 파일을 불러옵니다.
@@ -100,17 +99,13 @@ app.get('/apply_check', async (req, res) => {
 });
 
 app.post("/profile_update", upload.single("file"), async (req, res, next) => {
+  console.log(req.file);
   const { userId, userName } = req.body;
 
   try {
     let userImage = null;
     if (req.file) {
-      // multer로 업로드한 파일의 Buffer를 사용합니다.
-      const filename = req.file.filename;
-
-      // 파일 Buffer를 Cloudinary에 업로드합니다.
-      const result = await cloudinary.uploadImage(filename);
-      userImage = result.secure_url;
+      userImage = req.file.path;
     }
 
     // 사용자 이름과 이미지 URL을 업데이트하는 쿼리를 생성합니다.
@@ -143,8 +138,7 @@ app.post("/profile_update", upload.single("file"), async (req, res, next) => {
     return res.status(500).json({
       resultCode: 500,
       resultMsg: "이미지를 Cloudinary에 업로드하는 도중 오류가 발생했습니다.",
-      error: error.message,
-      filename : req.file.filename
+      error: error.message
     });
   }
 });
