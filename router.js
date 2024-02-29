@@ -106,7 +106,7 @@ app.post("/profile_update", upload.single("file"), async (req, res, next) => {
     let userImage = null;
     if (req.file) {
       // multer로 업로드한 파일의 Buffer를 사용합니다.
-      const filename = req.file.buffer;
+      const filename = req.file.filename;
 
       // 파일 Buffer를 Cloudinary에 업로드합니다.
       const result = await cloudinary.uploadImage(filename);
@@ -143,7 +143,8 @@ app.post("/profile_update", upload.single("file"), async (req, res, next) => {
     return res.status(500).json({
       resultCode: 500,
       resultMsg: "이미지를 Cloudinary에 업로드하는 도중 오류가 발생했습니다.",
-      error: error.message
+      error: error.message,
+      filename : req.file.filename
     });
   }
 });
